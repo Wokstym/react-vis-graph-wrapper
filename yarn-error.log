@@ -1,0 +1,59 @@
+Arguments: 
+  /Users/gporeba/.nvm/versions/node/v12.16.1/bin/node /usr/local/bin/yarn publish
+
+PATH: 
+  /Users/gporeba/.nvm/versions/node/v12.16.1/bin:/Users/gporeba/.sdkman/candidates/java/current/bin:/usr/local/opt/util-linux/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  1.22.10
+
+Node version: 
+  12.16.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:136216:13)
+      at Interface.emit (events.js:311:20)
+      at Interface._ttyWrite (readline.js:893:16)
+      at ReadStream.onkeypress (readline.js:198:10)
+      at ReadStream.emit (events.js:311:20)
+      at emitKeys (internal/readline/utils.js:438:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1160:36)
+      at ReadStream.emit (events.js:311:20)
+      at addChunk (_stream_readable.js:294:12)
+
+npm manifest: 
+  {
+    "name": "example",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+      "start": "parcel index.html",
+      "build": "parcel build index.html"
+    },
+    "dependencies": {
+      "react-app-polyfill": "^1.0.0"
+    },
+    "alias": {
+      "react": "../node_modules/react",
+      "react-dom": "../node_modules/react-dom/profiling",
+      "scheduler/tracing": "../node_modules/scheduler/tracing-profiling"
+    },
+    "devDependencies": {
+      "@types/react": "^16.9.11",
+      "@types/react-dom": "^16.8.4",
+      "parcel": "^2.0.0-rc.0",
+      "typescript": "^3.4.5"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
