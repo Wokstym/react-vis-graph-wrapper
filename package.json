@@ -36,6 +36,18 @@
   "name": "react-vis-graph-wrapper",
   "author": "Grzegorz Poreba",
   "module": "dist/react-vis-graph-wrapper.esm.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Wokstym/react-vis-graph-wrapper"
+  },
+  "keywords": [
+    "react-component",
+    "react",
+    "graph",
+    "network",
+    "vis-js",
+    "tsx"
+  ],
   "size-limit": [
     {
       "path": "dist/react-vis-graph-wrapper.cjs.production.min.js",

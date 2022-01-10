@@ -2,7 +2,7 @@
 
 A React component to display beautiful network graphs using vis.js
 
-Show, don't tell: [Demo](http://crubier.github.io/react-graph-vis/) // todo
+Show, don't tell: [Demo](https://wokstym.github.io/react-vis-graph-wrapper/)
 
 Make sure to visit [visjs.org](http://visjs.org) for more info.
 
@@ -96,4 +96,4 @@ ReactDOM.render(<App />, rootElement);
 
 
 
-You can also check out the demo in the [`example`](https://github.com/crubier/react-graph-vis/tree/master/example) folder.
+You can also check out the demo in the [`example`](https://github.com/Wokstym/react-vis-graph-wrapper/tree/master/example) folder.
