@@ -13,7 +13,7 @@ This package is a complete rewrite of [react-graph-vis](https://github.com/crubi
 Component is rewriten to function component for strict mode compliance and typing support is added (currently no types for specific GraphEvents - feel free to contribute)
 There was also added additional support for resizing windows.
 
-![A graph rendered by vis js](example.png)
+![A graph rendered by vis js](https://raw.githubusercontent.com/Wokstym/react-vis-graph-wrapper/master/example.png)
 
 Due to the imperative nature of vis.js, updating graph properties causes complete redraw of graph and completely porting it to React is a big project itself!
 
