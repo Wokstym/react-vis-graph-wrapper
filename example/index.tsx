@@ -2,7 +2,12 @@ import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { useState } from 'react';
-import VisGraph, { GraphData,GraphEvents, Node, Options, Edge } from '../.';
+
+import VisGraph, {
+  GraphData,
+  GraphEvents,
+  Options,
+} from 'react-vis-graph-wrapper';
 
 
 interface State {
@@ -84,14 +89,16 @@ const App = () => {
       <div>
         <h1>React graph vis</h1>
         <p>
-          <a href="https://github.com/crubier/react-graph-vis">Github</a> -{" "}
-          <a href="https://www.npmjs.com/package/react-graph-vis">NPM</a>
+          <a href="https://github.com/Wokstym/react-vis-graph-wrapper">Github</a> -{" "}
+          <a href="https://www.npmjs.com/package/react-vis-graph-wrapper">NPM</a>
         </p>
-        <p><a href="https://github.com/crubier/react-graph-vis/tree/master/example/src/index.js">Source of this page</a></p>
+        <p><a href="https://github.com/Wokstym/react-vis-graph-wrapper/blob/master/example/index.tsx">Source of this page</a></p>
         <p>A React component to display beautiful network graphs using vis.js</p>
         <p>Make sure to visit <a href="http://visjs.org">visjs.org</a> for more info.</p>
         <p>This package allows to render network graphs using vis.js.</p>
         <p>Rendered graphs are scrollable, zoomable, retina ready, dynamic</p>
+        <p>This package is a complete rewrite of <a href="https://github.com/crubier/react-graph-vis">react-graph-vis</a> to function component for strict mode compliance and typing support is added. 
+        There was also added additional support for resizing windows.</p>
         <p>In this example, we manage state with react: on double click we create a new node, and on select we display an alert.</p>
         <VisGraph graph={graph} options={options} events={events} style={{ height: "640px" }} />
       </div>
