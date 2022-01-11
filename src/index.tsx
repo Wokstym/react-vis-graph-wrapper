@@ -42,7 +42,6 @@ export interface GraphData {
 export interface NetworkGraphProps {
   graph: GraphData;
   options?: Options;
-  getNetwork?: (network: any) => void;
   events?: GraphEvents;
   style?: React.CSSProperties;
   className?: string;
@@ -130,7 +129,7 @@ function useResizeObserver(
 const VisGraph = forwardRef<
 Network | undefined,
 NetworkGraphProps & HTMLAttributes<HTMLDivElement>
->(({ graph, events, getNetwork, options: propOptions, ...props }, ref) => {
+>(({ graph, events, options: propOptions, ...props }, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const edges = useSealedState(() => new DataSet<Edge>(graph.edges));
   const nodes = useSealedState(() => new DataSet<Node>(graph.nodes));
@@ -214,9 +213,6 @@ NetworkGraphProps & HTMLAttributes<HTMLDivElement>
       mergedOptions,
     );
     setNetwork(newNetwork);
-    if(getNetwork) {
-      getNetwork(newNetwork)
-    }
     return () => {
       // Cleanup the network on component unmount
       newNetwork.destroy();
