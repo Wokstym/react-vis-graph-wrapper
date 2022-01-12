@@ -25,6 +25,7 @@ import {
 
 import 'vis-network/styles/vis-network.css';
 
+// prettier-ignore
 export type {
   Network, Edge, Node, Options, NetworkEvents, IdType, 
 };
