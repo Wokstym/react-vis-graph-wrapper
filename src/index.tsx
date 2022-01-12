@@ -31,8 +31,8 @@ export type {
 };
 
 export type GraphEvents = Partial<
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-Record<NetworkEvents, (params?: any) => void>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Record<NetworkEvents, (params?: any) => void>
 >;
 
 export interface GraphData {
@@ -62,7 +62,7 @@ function useSealedState<T>(value: T | (() => T)) {
 const diff = <T extends { id?: IdType }>(
   current: T[],
   next: T[],
-  field: keyof T = 'id',
+  field: keyof T = 'id'
 ) => {
   const nextIds = new Set(next.map((item) => item[field]));
   const removed = current.filter((item) => !nextIds.has(item[field]));
@@ -72,13 +72,13 @@ const diff = <T extends { id?: IdType }>(
   const updated = differenceWith(
     intersectionWith(next, current, (a, b) => a[field] === b[field]),
     unchanged,
-    isEqual,
+    isEqual
   );
 
   const added = differenceWith(
     differenceWith(next, current, isEqual),
     updated,
-    isEqual,
+    isEqual
   );
 
   return {
@@ -109,7 +109,7 @@ const defaultOptions = {
 
 function useResizeObserver(
   ref: React.MutableRefObject<HTMLElement | null>,
-  callback: ResizeObserverCallback,
+  callback: ResizeObserverCallback
 ): void {
   useEffect(() => {
     // Create an observer instance linked to the callback function
@@ -128,8 +128,8 @@ function useResizeObserver(
 }
 
 const VisGraph = forwardRef<
-Network | undefined,
-NetworkGraphProps & HTMLAttributes<HTMLDivElement>
+  Network | undefined,
+  NetworkGraphProps & HTMLAttributes<HTMLDivElement>
 >(({ graph, events, options: propOptions, ...props }, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const edges = useSealedState(() => new DataSet<Edge>(graph.edges));
@@ -206,12 +206,12 @@ NetworkGraphProps & HTMLAttributes<HTMLDivElement>
     // defaultsDeep mutates the host object
     const mergedOptions = defaultsDeep(
       cloneDeep(initialOptions),
-      defaultOptions,
+      defaultOptions
     );
     const newNetwork = new Network(
       container.current as HTMLElement,
       { edges, nodes },
-      mergedOptions,
+      mergedOptions
     );
     setNetwork(newNetwork);
     return () => {
@@ -221,15 +221,17 @@ NetworkGraphProps & HTMLAttributes<HTMLDivElement>
   }, [edges, initialOptions, nodes]);
 
   //resize network on window resize
-  function onContainerResize(){
-    if (network){
+  function onContainerResize() {
+    if (network) {
       network.redraw();
     }
   }
 
   useResizeObserver(container, onContainerResize);
 
-  return <div style={ { width: '100%', height: '100%' }} ref={container} {...props} />;
+  return (
+    <div style={{ width: '100%', height: '100%' }} ref={container} {...props} />
+  );
 });
 
 export default VisGraph;
