@@ -25,7 +25,7 @@ This component takes three vis.js configuration objects as properties:
 
 # Usage
 
-```javascript
+```typescript
 import React from 'react';
 import './App.css';
 
@@ -73,7 +73,7 @@ function App() {
       graph={graph}
       options={options}
       events={events}
-      getNetwork={(network: any) => {
+      ref={(network: Network) => {
         //  if you want access to vis.js network api you can set the state in a parent component using this property
         console.log(network);
       }}

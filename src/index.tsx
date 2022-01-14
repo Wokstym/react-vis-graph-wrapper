@@ -25,13 +25,11 @@ import {
 
 import 'vis-network/styles/vis-network.css';
 
-export type {
-  Network, Edge, Node, Options, NetworkEvents, IdType, 
-};
+export type { Network, Edge, Node, Options, NetworkEvents, IdType };
 
 export type GraphEvents = Partial<
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-Record<NetworkEvents, (params?: any) => void>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Record<NetworkEvents, (params?: any) => void>
 >;
 
 export interface GraphData {
@@ -42,7 +40,6 @@ export interface GraphData {
 export interface NetworkGraphProps {
   graph: GraphData;
   options?: Options;
-  getNetwork?: (network: any) => void;
   events?: GraphEvents;
   style?: React.CSSProperties;
   className?: string;
@@ -59,7 +56,7 @@ function useSealedState<T>(value: T | (() => T)) {
 /**
  * https://github.com/crubier/react-graph-vis/commit/68bf2e27b2046d6c0bb8b334c2cf974d23443264
  */
- function diff<T extends { id?: IdType }>(
+function diff<T extends { id?: IdType }>(
   from: T[],
   to: T[],
   field: keyof T = 'id'
@@ -108,7 +105,7 @@ const defaultOptions = {
 
 function useResizeObserver(
   ref: React.MutableRefObject<HTMLElement | null>,
-  callback: ResizeObserverCallback,
+  callback: ResizeObserverCallback
 ): void {
   useEffect(() => {
     // Create an observer instance linked to the callback function
@@ -127,9 +124,9 @@ function useResizeObserver(
 }
 
 const VisGraph = forwardRef<
-Network | undefined,
-NetworkGraphProps & HTMLAttributes<HTMLDivElement>
->(({ graph, events, getNetwork, options: propOptions, ...props }, ref) => {
+  Network | undefined,
+  NetworkGraphProps & HTMLAttributes<HTMLDivElement>
+>(({ graph, events, options: propOptions, ...props }, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const edges = useSealedState(() => new DataSet<Edge>(graph.edges));
   const nodes = useSealedState(() => new DataSet<Node>(graph.nodes));
@@ -205,17 +202,14 @@ NetworkGraphProps & HTMLAttributes<HTMLDivElement>
     // defaultsDeep mutates the host object
     const mergedOptions = defaultsDeep(
       cloneDeep(initialOptions),
-      defaultOptions,
+      defaultOptions
     );
     const newNetwork = new Network(
       container.current as HTMLElement,
       { edges, nodes },
-      mergedOptions,
+      mergedOptions
     );
     setNetwork(newNetwork);
-    if(getNetwork) {
-      getNetwork(newNetwork)
-    }
     return () => {
       // Cleanup the network on component unmount
       newNetwork.destroy();
@@ -223,15 +217,17 @@ NetworkGraphProps & HTMLAttributes<HTMLDivElement>
   }, [edges, initialOptions, nodes]);
 
   //resize network on window resize
-  function onContainerResize(){
-    if (network){
+  function onContainerResize() {
+    if (network) {
       network.redraw();
     }
   }
 
   useResizeObserver(container, onContainerResize);
 
-  return <div style={ { width: '100%', height: '100%' }} ref={container} {...props} />;
+  return (
+    <div style={{ width: '100%', height: '100%' }} ref={container} {...props} />
+  );
 });
 
 export default VisGraph;
