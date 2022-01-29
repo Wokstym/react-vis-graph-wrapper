@@ -56,35 +56,34 @@ function useSealedState<T>(value: T | (() => T)) {
 /**
  * https://github.com/crubier/react-graph-vis/commit/68bf2e27b2046d6c0bb8b334c2cf974d23443264
  */
-const diff = <T extends { id?: IdType }>(
-  current: T[],
-  next: T[],
+function diff<T extends { id?: IdType }>(
+  from: T[],
+  to: T[],
   field: keyof T = 'id'
-) => {
-  const nextIds = new Set(next.map((item) => item[field]));
-  const removed = current.filter((item) => !nextIds.has(item[field]));
+) {
+  function accessor(item: T) {
+    return item[field];
+  }
+  const nextIds = new Set(from.map(accessor));
+  const prevIds = new Set(to.map(accessor));
+  const removed = to.filter((item) => !nextIds.has(accessor(item)));
 
-  const unchanged = intersectionWith(next, current, isEqual);
+  const unchanged = intersectionWith(from, to, isEqual);
 
   const updated = differenceWith(
-    intersectionWith(next, current, (a, b) => a[field] === b[field]),
+    intersectionWith(from, to, (a, b) => accessor(a) === accessor(b)),
     unchanged,
     isEqual
   );
 
-  const added = differenceWith(
-    differenceWith(next, current, isEqual),
-    updated,
-    isEqual
-  );
-
+  const added = from.filter((item) => !prevIds.has(accessor(item)));
   return {
     removed,
     unchanged,
     updated,
     added,
   };
-};
+}
 
 const defaultOptions = {
   physics: {
