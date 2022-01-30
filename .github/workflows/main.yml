@@ -21,6 +21,10 @@ jobs:
 
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
+        if: failure()
+        with: 
+          name: npm-logs
+          path: ~/.npm/_logs
 
       - name: Lint
         run: yarn lint
