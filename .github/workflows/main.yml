@@ -27,7 +27,7 @@ jobs:
           path: ~/.npm/_logs
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Build
-        run: yarn build
+        run: npm run build
