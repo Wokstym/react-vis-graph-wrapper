@@ -21,8 +21,8 @@ jobs:
 
       - name: Install deps and build (with cache)
         uses: bahmutov/npm-install@v1
-        if: failure()
-        with: 
+        with:
+          key: ${{ runner.os }}-buildsss-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           name: npm-logs
           path: ~/.npm/_logs
 
