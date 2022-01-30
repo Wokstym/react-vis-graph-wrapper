@@ -19,12 +19,14 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install deps and build (with cache)
-        uses: bahmutov/npm-install@v1
-        with:
-          key: ${{ runner.os }}-buildsss-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          name: npm-logs
-          path: ~/.npm/_logs
+#      - name: Install deps and build (with cache)
+#        uses: bahmutov/npm-install@v1
+#        if: failure()
+#        with:
+#          name: npm-logs
+#          path: ~/.npm/_logs
+      - name: Install
+        run: npm install
 
       - name: Lint
         run: npm run lint
