@@ -36,7 +36,7 @@ export interface GraphData {
 export interface NetworkGraphProps {
   graph: GraphData;
   options?: Options;
-  events?: GraphEvents;
+  events?: Partial<GraphEvents>;
   style?: React.CSSProperties;
   className?: string;
 }
