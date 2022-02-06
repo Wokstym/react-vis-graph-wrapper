@@ -1,6 +1,6 @@
 export type GraphEvents = Partial<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  | Record<UnsupportedTypeNetworkEvents, (params?: any) => void>
+  | Record<UnsupportedTypeNetworkEvents, (params?: unknown) => void>
   | Record<'click', (params: SingleClickData) => void>
   | Record<
       | 'doubleClick'
