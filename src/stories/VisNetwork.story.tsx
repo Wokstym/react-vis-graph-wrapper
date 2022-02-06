@@ -1,7 +1,7 @@
 import React from 'react';
 import VisGraph, { NetworkGraphProps } from '..';
 import { Meta, Story } from '@storybook/react';
-
+import {BaseClickData, SingleClickData} from "../EventTypes";
 
 export default {
     title: 'Basic graph example',
@@ -23,5 +23,14 @@ BasicNetwork.args = {
     graph: {
         nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
         edges: [{ from: 1, to: 2 }, { from: 2, to: 3 }]
+    }
+}
+
+export const NetworkWithClickEvents = Template.bind({});
+NetworkWithClickEvents.args = {
+    ...BasicNetwork.args,
+    events: {
+        click: (params: SingleClickData) => console.log(params.edges, params.nodes),
+        doubleClick: (params: BaseClickData) => console.log(params.pointer)
     }
 }
