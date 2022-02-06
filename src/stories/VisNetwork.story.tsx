@@ -1,7 +1,7 @@
 import React from 'react';
 import VisGraph, { NetworkGraphProps } from '..';
 import { Meta, Story } from '@storybook/react';
-import {BaseClickData, SingleClickData} from "../EventTypes";
+import { BaseClickData, SingleClickData } from '../EventTypes';
 
 export default {
     title: 'Basic graph example',
