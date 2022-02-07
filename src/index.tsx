@@ -140,7 +140,7 @@ const VisGraph = forwardRef<
     if (isEqual(graph.nodes, prevNodes.current)) {
       return; // No change!
     }
-    const { added, removed, updated } = diff(prevNodes.current, graph.nodes);
+    const { added, removed, updated } = diff(nodes.get(), graph.nodes);
 
     if (removed.length) {
       nodes.remove(removed);
@@ -152,14 +152,14 @@ const VisGraph = forwardRef<
     if (updated.length) {
       nodes.update(shallowClone(updated));
     }
-    prevNodes.current = nodes.get();
+    prevNodes.current = graph.nodes;
   }, [graph.nodes, nodes]);
 
   useEffect(() => {
     if (isEqual(graph.edges, prevEdges.current)) {
       return; // No change!
     }
-    const { added, removed, updated } = diff(prevEdges.current, graph.edges);
+    const { added, removed, updated } = diff(edges.get(), graph.edges);
     if (removed.length) {
       edges.remove(removed);
     }
@@ -170,7 +170,7 @@ const VisGraph = forwardRef<
     if (updated.length) {
       edges.update(shallowClone(updated));
     }
-    prevEdges.current = edges.get();
+    prevEdges.current = graph.edges;
   }, [graph.edges, edges]);
   const [network, setNetwork] = useState<Network>();
 
