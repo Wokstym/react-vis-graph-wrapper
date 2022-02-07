@@ -64,19 +64,19 @@ function diff<T extends { id?: IdType }>(
   function accessor(item: T) {
     return item[field];
   }
-  const nextIds = new Set(from.map(accessor));
-  const prevIds = new Set(to.map(accessor));
-  const removed = to.filter((item) => !nextIds.has(accessor(item)));
+  const nextIds = new Set(to.map(accessor));
+  const prevIds = new Set(from.map(accessor));
+  const removed = from.filter((item) => !nextIds.has(accessor(item)));
 
   const unchanged = intersectionWith(from, to, isEqual);
 
   const updated = differenceWith(
-    intersectionWith(from, to, (a, b) => accessor(a) === accessor(b)),
+    intersectionWith(to, from, (a, b) => accessor(a) === accessor(b)),
     unchanged,
     isEqual
   );
 
-  const added = from.filter((item) => !prevIds.has(accessor(item)));
+  const added = to.filter((item) => !prevIds.has(accessor(item)));
   return {
     removed,
     unchanged,
@@ -122,7 +122,9 @@ function useResizeObserver(
     return;
   }, [callback, ref]);
 }
-
+function shallowClone<T>(array: T[]): T[] {
+  return array.map((value) => ({ ...value }));
+}
 const VisGraph = forwardRef<
   Network | undefined,
   NetworkGraphProps & HTMLAttributes<HTMLDivElement>
@@ -140,10 +142,17 @@ const VisGraph = forwardRef<
     }
     const { added, removed, updated } = diff(prevNodes.current, graph.nodes);
 
-    nodes.remove(removed);
-    nodes.add(added);
-    nodes.update(updated);
-    prevNodes.current = graph.nodes;
+    if (removed.length) {
+      nodes.remove(removed);
+    }
+    // Shallow clone nodes to ensure props aren't mutated!
+    if (added.length) {
+      nodes.add(shallowClone(added));
+    }
+    if (updated.length) {
+      nodes.update(shallowClone(updated));
+    }
+    prevNodes.current = nodes.get();
   }, [graph.nodes, nodes]);
 
   useEffect(() => {
@@ -151,11 +160,17 @@ const VisGraph = forwardRef<
       return; // No change!
     }
     const { added, removed, updated } = diff(prevEdges.current, graph.edges);
-
-    edges.remove(removed);
-    edges.add(added);
-    edges.update(updated);
-    prevEdges.current = graph.edges;
+    if (removed.length) {
+      edges.remove(removed);
+    }
+    // Shallow clone edges to ensure props aren't mutated!
+    if (added.length) {
+      edges.add(shallowClone(added));
+    }
+    if (updated.length) {
+      edges.update(shallowClone(updated));
+    }
+    prevEdges.current = edges.get();
   }, [graph.edges, edges]);
   const [network, setNetwork] = useState<Network>();
 
