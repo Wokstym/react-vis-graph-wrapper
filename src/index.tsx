@@ -24,13 +24,9 @@ import {
 } from 'lodash';
 
 import 'vis-network/styles/vis-network.css';
+import { GraphEvents } from './EventTypes';
 
 export type { Network, Edge, Node, Options, NetworkEvents, IdType };
-
-export type GraphEvents = Partial<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Record<NetworkEvents, (params?: any) => void>
->;
 
 export interface GraphData {
   nodes: Node[];
@@ -40,7 +36,7 @@ export interface GraphData {
 export interface NetworkGraphProps {
   graph: GraphData;
   options?: Options;
-  events?: GraphEvents;
+  events?: Partial<GraphEvents>;
   style?: React.CSSProperties;
   className?: string;
   /**
