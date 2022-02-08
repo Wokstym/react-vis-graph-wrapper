@@ -1,10 +1,12 @@
 import { Meta, Story } from '@storybook/react';
 import React from 'react';
 import VisGraph, { NetworkGraphProps } from '..';
+import { __fakeType } from './fakeType';
 
 export default {
   title: 'Basic graph example',
-  component: VisGraph,
+  // storybook doesn't work well with forward ref components
+  component: __fakeType,
 } as Meta;
 
 type StoryProps = NetworkGraphProps;
