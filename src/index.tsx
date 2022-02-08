@@ -225,5 +225,6 @@ const VisGraph = forwardRef<
     <div style={{ width: '100%', height: '100%' }} ref={container} {...props} />
   );
 });
-
+// Set displayName explicitly as it isn't implicitly set
+VisGraph.displayName = 'VisGraph';
 export default VisGraph;
