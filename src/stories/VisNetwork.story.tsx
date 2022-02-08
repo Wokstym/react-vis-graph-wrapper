@@ -1,6 +1,6 @@
+import { Meta, Story } from '@storybook/react';
 import React from 'react';
 import VisGraph, { NetworkGraphProps } from '..';
-import { Meta, Story } from '@storybook/react';
 import { __fakeType } from './fakeType';
 
 export default {
@@ -27,5 +27,14 @@ BasicNetwork.args = {
       { from: 1, to: 2 },
       { from: 2, to: 3 },
     ],
+  },
+};
+
+export const NetworkWithClickEvents = Template.bind({});
+NetworkWithClickEvents.args = {
+  ...BasicNetwork.args,
+  events: {
+    click: (params) => console.log(params),
+    doubleClick: (params) => console.log(params),
   },
 };
