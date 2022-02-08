@@ -43,6 +43,10 @@ export interface NetworkGraphProps {
   events?: GraphEvents;
   style?: React.CSSProperties;
   className?: string;
+  /**
+   * Require a modifier key in order to zoom to allow it on scrolling pages
+   */
+  zoomKey?: 'ctrlKey' | 'shiftKey' | 'altKey';
 }
 /**
  * Keeps the value the same permanently.
@@ -126,7 +130,7 @@ function useResizeObserver(
 const VisGraph = forwardRef<
   Network | undefined,
   NetworkGraphProps & HTMLAttributes<HTMLDivElement>
->(({ graph, events, options: propOptions, ...props }, ref) => {
+>(({ graph, events, options: propOptions, zoomKey, ...props }, ref) => {
   const container = useRef<HTMLDivElement>(null);
   const edges = useSealedState(() => new DataSet<Edge>(graph.edges));
   const nodes = useSealedState(() => new DataSet<Node>(graph.nodes));
@@ -179,6 +183,27 @@ const VisGraph = forwardRef<
       }
     };
   }, [events, network]);
+
+  useEffect(() => {
+    if (!zoomKey || !network) {
+      return () => {};
+    }
+    const { interactionHandler } = network as any;
+    if (interactionHandler) {
+      const originalHandler =
+        interactionHandler.body.eventListeners.onMouseWheel;
+      interactionHandler.body.eventListeners.onMouseWheel = (
+        event: MouseEvent
+      ) => {
+        if (!event[zoomKey]) return; // ctrlKey detects a max touchpad pinch in onwheel event
+        originalHandler(event);
+      };
+      return () => {
+        interactionHandler.body.eventListeners.onMouseWheel = originalHandler;
+      };
+    }
+    return () => {};
+  }, [network, zoomKey]);
 
   useEffect(() => {
     if (!network || !propOptions) {
