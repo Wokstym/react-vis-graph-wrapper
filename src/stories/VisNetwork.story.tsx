@@ -38,3 +38,31 @@ NetworkWithClickEvents.args = {
     doubleClick: (params) => console.log(params),
   },
 };
+
+const ZoomKeyTemplate: Story<StoryProps> = (args) => {
+  return (
+    <div>
+      <p> Use {args.zoomKey} to zoom so that scrolling normally works</p>
+      <div
+        style={{
+          width: '520px',
+          height: '250px',
+          border: '1px solid black',
+          overflow: 'auto',
+        }}
+      >
+        <div
+          style={{ width: '500px', height: '500px', border: '1px solid black' }}
+        >
+          <VisGraph {...args} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ZoomKey = ZoomKeyTemplate.bind({});
+ZoomKey.args = {
+  ...BasicNetwork.args,
+  zoomKey: 'ctrlKey',
+};
