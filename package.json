@@ -1,6 +1,7 @@
 {
   "version": "0.1.3",
   "license": "MIT",
+  "homepage": "https://wokstym.github.io/react-vis-graph-wrapper/",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -19,7 +20,8 @@
     "size": "size-limit",
     "analyze": "size-limit --why",
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "deploy-storybook": "gh-pages -d storybook-static"
   },
   "peerDependencies": {
     "react": ">=16"
@@ -73,6 +75,7 @@
     "@types/resize-observer-browser": "^0.1.6",
     "babel-loader": "^8.2.3",
     "eslint-plugin-prettier": "^3.4",
+    "gh-pages": "^3.2.3",
     "husky": "^7.0.4",
     "prettier": "^2.5.1",
     "react": "^17.0.2",
