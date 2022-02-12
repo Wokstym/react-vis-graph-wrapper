@@ -1,3 +1,10 @@
+import {
+  cloneDeep,
+  defaultsDeep,
+  differenceWith,
+  intersectionWith,
+  isEqual,
+} from 'lodash';
 import React, {
   forwardRef,
   HTMLAttributes,
@@ -7,22 +14,15 @@ import React, {
   useState,
 } from 'react';
 import { DataSet } from 'vis-data';
+import { DeepPartial } from 'vis-data/declarations/data-interface';
 import {
-  Network,
   Edge,
+  IdType,
+  Network,
+  NetworkEvents,
   Node,
   Options,
-  NetworkEvents,
-  IdType,
 } from 'vis-network';
-import {
-  differenceWith,
-  intersectionWith,
-  isEqual,
-  defaultsDeep,
-  cloneDeep,
-} from 'lodash';
-
 import 'vis-network/styles/vis-network.css';
 import { GraphEvents } from './EventTypes';
 
@@ -64,19 +64,19 @@ function diff<T extends { id?: IdType }>(
   function accessor(item: T) {
     return item[field];
   }
-  const nextIds = new Set(from.map(accessor));
-  const prevIds = new Set(to.map(accessor));
-  const removed = to.filter((item) => !nextIds.has(accessor(item)));
+  const nextIds = new Set(to.map(accessor));
+  const prevIds = new Set(from.map(accessor));
+  const removed = from.filter((item) => !nextIds.has(accessor(item)));
 
   const unchanged = intersectionWith(from, to, isEqual);
 
   const updated = differenceWith(
-    intersectionWith(from, to, (a, b) => accessor(a) === accessor(b)),
+    intersectionWith(to, from, (a, b) => accessor(a) === accessor(b)),
     unchanged,
     isEqual
   );
 
-  const added = from.filter((item) => !prevIds.has(accessor(item)));
+  const added = to.filter((item) => !prevIds.has(accessor(item)));
   return {
     removed,
     unchanged,
@@ -122,41 +122,42 @@ function useResizeObserver(
     return;
   }, [callback, ref]);
 }
+function shallowClone<T>(array: T[]): T[] {
+  return array.map((value) => ({ ...value }));
+}
+
+function useDataset<T>(values: T[]) {
+  const dataSet = useSealedState(() => new DataSet<T>(values));
+  const prevValues = useRef(values);
+  useEffect(() => {
+    if (isEqual(values, prevValues.current)) {
+      return; // No change!
+    }
+    const { added, removed, updated } = diff(dataSet.get(), values);
+
+    dataSet.remove(removed);
+    // Shallow clone dataSet to ensure props aren't mutated!
+    if (added.length) {
+      dataSet.add(shallowClone(added));
+    }
+    if (updated.length) {
+      // cast needed for update to not complain about the generic type
+      dataSet.update(shallowClone(updated) as DeepPartial<T>[]);
+    }
+    prevValues.current = values;
+  }, [values, dataSet]);
+  return dataSet;
+}
 
 const VisGraph = forwardRef<
   Network | undefined,
   NetworkGraphProps & HTMLAttributes<HTMLDivElement>
 >(({ graph, events, options: propOptions, zoomKey, ...props }, ref) => {
   const container = useRef<HTMLDivElement>(null);
-  const edges = useSealedState(() => new DataSet<Edge>(graph.edges));
-  const nodes = useSealedState(() => new DataSet<Node>(graph.nodes));
   const initialOptions = useSealedState(propOptions);
+  const edges = useDataset(graph.edges);
+  const nodes = useDataset(graph.nodes);
 
-  const prevNodes = useRef(graph.nodes);
-  const prevEdges = useRef(graph.edges);
-  useEffect(() => {
-    if (isEqual(graph.nodes, prevNodes.current)) {
-      return; // No change!
-    }
-    const { added, removed, updated } = diff(prevNodes.current, graph.nodes);
-
-    nodes.remove(removed);
-    nodes.add(added);
-    nodes.update(updated);
-    prevNodes.current = graph.nodes;
-  }, [graph.nodes, nodes]);
-
-  useEffect(() => {
-    if (isEqual(graph.edges, prevEdges.current)) {
-      return; // No change!
-    }
-    const { added, removed, updated } = diff(prevEdges.current, graph.edges);
-
-    edges.remove(removed);
-    edges.add(added);
-    edges.update(updated);
-    prevEdges.current = graph.edges;
-  }, [graph.edges, edges]);
   const [network, setNetwork] = useState<Network>();
 
   useImperativeHandle(ref, () => network, [network]);
