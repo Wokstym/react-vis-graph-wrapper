@@ -30,8 +30,12 @@ export function useResizeNetwork(
       () => {
         networkRef.current?.redraw();
       },
-      100,
-      { maxWait: 200 }
+      // we can play around with these timings a bit
+      // the events appear to fire off every 15ms, it appears
+      // so 30/60 has a bit of a stutter to it, whereas not using debouncing gives
+      // a really smooth looking resize
+      30,
+      { maxWait: 60 }
     );
     return new ResizeObserver((entries: ResizeObserverEntry[]) => {
       entries.forEach(() => {
