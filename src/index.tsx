@@ -89,7 +89,7 @@ const defaultOptions = {
   physics: {
     stabilization: false,
   },
-  autoResize: false,
+  autoResize: true,
   edges: {
     smooth: false,
     color: '#000000',
@@ -103,25 +103,6 @@ const defaultOptions = {
   },
 };
 
-function useResizeObserver(
-  ref: React.MutableRefObject<HTMLElement | null>,
-  callback: ResizeObserverCallback
-): void {
-  useEffect(() => {
-    // Create an observer instance linked to the callback function
-    if (ref.current) {
-      const observer = new ResizeObserver(callback);
-
-      // Start observing the target node for configured mutations
-      observer.observe(ref.current);
-
-      return () => {
-        observer.disconnect();
-      };
-    }
-    return;
-  }, [callback, ref]);
-}
 function shallowClone<T>(array: T[]): T[] {
   return array.map((value) => ({ ...value }));
 }
@@ -237,15 +218,6 @@ const VisGraph = forwardRef<
       newNetwork.destroy();
     };
   }, [edges, initialOptions, nodes]);
-
-  //resize network on window resize
-  function onContainerResize() {
-    if (network) {
-      network.redraw();
-    }
-  }
-
-  useResizeObserver(container, onContainerResize);
 
   return (
     <div style={{ width: '100%', height: '100%' }} ref={container} {...props} />
