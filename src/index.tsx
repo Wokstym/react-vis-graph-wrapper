@@ -8,6 +8,7 @@ import {
 import React, {
   forwardRef,
   HTMLAttributes,
+  Ref,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -43,6 +44,7 @@ export interface NetworkGraphProps {
    * Require a modifier key in order to zoom to allow it on scrolling pages
    */
   zoomKey?: 'ctrlKey' | 'shiftKey' | 'altKey';
+  networkRef?: Ref<Network>;
 }
 /**
  * Keeps the value the same permanently.
@@ -103,25 +105,26 @@ const defaultOptions = {
   },
 };
 
-function useResizeObserver(
-  ref: React.MutableRefObject<HTMLElement | null>,
-  callback: ResizeObserverCallback
-): void {
-  useEffect(() => {
-    // Create an observer instance linked to the callback function
-    if (ref.current) {
-      const observer = new ResizeObserver(callback);
+// function useResizeObserver(
+//   ref: React.MutableRefObject<HTMLElement | null>,
+//   callback: ResizeObserverCallback
+// ): void {
+//   useEffect(() => {
+//     // Create an observer instance linked to the callback function
+//     if (ref.current) {
+//       const observer = new ResizeObserver(callback);
 
-      // Start observing the target node for configured mutations
-      observer.observe(ref.current);
+//       // Start observing the target node for configured mutations
+//       observer.observe(ref.current);
 
-      return () => {
-        observer.disconnect();
-      };
-    }
-    return;
-  }, [callback, ref]);
-}
+//       return () => {
+//         observer.disconnect();
+//       };
+//     }
+//     return;
+//   }, [callback, ref]);
+// }
+
 function shallowClone<T>(array: T[]): T[] {
   return array.map((value) => ({ ...value }));
 }
@@ -238,14 +241,14 @@ const VisGraph = forwardRef<
     };
   }, [edges, initialOptions, nodes]);
 
-  //resize network on window resize
-  function onContainerResize() {
-    if (network) {
-      network.redraw();
-    }
-  }
+  // //resize network on window resize
+  // function onContainerResize() {
+  //   if (network) {
+  //     network.redraw();
+  //   }
+  // }
 
-  useResizeObserver(container, onContainerResize);
+  // useResizeObserver(container, onContainerResize);
 
   return (
     <div style={{ width: '100%', height: '100%' }} ref={container} {...props} />

@@ -1,6 +1,8 @@
 import { Meta, Story } from '@storybook/react';
-import React from 'react';
+import { default as React, useState } from 'react';
+import { Network } from 'vis-network';
 import VisGraph, { NetworkGraphProps } from '..';
+import { useResizeNetwork } from '../utils';
 import { __fakeType } from './fakeType';
 
 export default {
@@ -65,4 +67,29 @@ export const ZoomKey = ZoomKeyTemplate.bind({});
 ZoomKey.args = {
   ...BasicNetwork.args,
   zoomKey: 'ctrlKey',
+};
+
+function Resizable(props: any) {
+  const [network, setNetwork] = useState<Network>();
+  useResizeNetwork(network);
+  return <VisGraph ref={setNetwork} {...props} />;
+}
+
+const ResizeTemplate: Story<StoryProps> = (args) => {
+  return (
+    <div style={{ width: 'calc(100vw - 2rem)', height: 'calc(100vh - 2rem)' }}>
+      <Resizable {...args} />
+    </div>
+  );
+};
+
+export const ResizeNetwork = ResizeTemplate.bind({});
+ResizeNetwork.args = {
+  graph: {
+    nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
+    edges: [
+      { from: 1, to: 2 },
+      { from: 2, to: 3 },
+    ],
+  },
 };
