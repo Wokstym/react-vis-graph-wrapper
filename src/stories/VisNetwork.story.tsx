@@ -1,8 +1,7 @@
 import { Meta, Story } from '@storybook/react';
-import { default as React, useState } from 'react';
-import { Network } from 'vis-network';
-import VisGraph, { NetworkGraphProps } from '..';
-import { useResizeNetwork } from '../utils';
+import { default as React } from 'react';
+import VisGraph, { GraphData, NetworkGraphProps } from '..';
+import { ResponsiveVisGraph } from '../ResponsiveVisGraph';
 import { __fakeType } from './fakeType';
 
 export default {
@@ -20,16 +19,16 @@ const Template: Story<StoryProps> = (args) => {
     </div>
   );
 };
-
+const baseGraph: GraphData = {
+  nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
+  edges: [
+    { from: 1, to: 2 },
+    { from: 2, to: 3 },
+  ],
+};
 export const BasicNetwork = Template.bind({});
 BasicNetwork.args = {
-  graph: {
-    nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
-    edges: [
-      { from: 1, to: 2 },
-      { from: 2, to: 3 },
-    ],
-  },
+  graph: baseGraph,
 };
 
 export const NetworkWithClickEvents = Template.bind({});
@@ -65,31 +64,25 @@ const ZoomKeyTemplate: Story<StoryProps> = (args) => {
 
 export const ZoomKey = ZoomKeyTemplate.bind({});
 ZoomKey.args = {
-  ...BasicNetwork.args,
+  graph: baseGraph,
   zoomKey: 'ctrlKey',
 };
 
-function Resizable(props: any) {
-  const [network, setNetwork] = useState<Network>();
-  useResizeNetwork(network);
-  return <VisGraph ref={setNetwork} {...props} />;
-}
-
 const ResizeTemplate: Story<StoryProps> = (args) => {
   return (
-    <div style={{ width: 'calc(100vw - 2rem)', height: 'calc(100vh - 2rem)' }}>
-      <Resizable {...args} />
+    <div
+      style={{
+        resize: 'both',
+        overflow: 'auto',
+        border: '1px solid black',
+      }}
+    >
+      <ResponsiveVisGraph {...args} />
     </div>
   );
 };
 
 export const ResizeNetwork = ResizeTemplate.bind({});
 ResizeNetwork.args = {
-  graph: {
-    nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
-    edges: [
-      { from: 1, to: 2 },
-      { from: 2, to: 3 },
-    ],
-  },
+  graph: baseGraph,
 };

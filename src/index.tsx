@@ -26,6 +26,7 @@ import {
 } from 'vis-network';
 import 'vis-network/styles/vis-network.css';
 import { GraphEvents } from './EventTypes';
+import { handleRef } from './utils';
 
 export type { Network, Edge, Node, Options, NetworkEvents, IdType };
 
@@ -44,7 +45,7 @@ export interface NetworkGraphProps {
    * Require a modifier key in order to zoom to allow it on scrolling pages
    */
   zoomKey?: 'ctrlKey' | 'shiftKey' | 'altKey';
-  networkRef?: Ref<Network>;
+  networkRef?: Ref<Network | undefined>;
 }
 /**
  * Keeps the value the same permanently.
@@ -105,32 +106,13 @@ const defaultOptions = {
   },
 };
 
-// function useResizeObserver(
-//   ref: React.MutableRefObject<HTMLElement | null>,
-//   callback: ResizeObserverCallback
-// ): void {
-//   useEffect(() => {
-//     // Create an observer instance linked to the callback function
-//     if (ref.current) {
-//       const observer = new ResizeObserver(callback);
-
-//       // Start observing the target node for configured mutations
-//       observer.observe(ref.current);
-
-//       return () => {
-//         observer.disconnect();
-//       };
-//     }
-//     return;
-//   }, [callback, ref]);
-// }
-
 function shallowClone<T>(array: T[]): T[] {
   return array.map((value) => ({ ...value }));
 }
 
 function useDataset<T>(values: T[]) {
-  const dataSet = useSealedState(() => new DataSet<T>(values));
+  // Shallow clone dataSet to ensure props aren't mutated!
+  const dataSet = useSealedState(() => new DataSet<T>(shallowClone(values)));
   const prevValues = useRef(values);
   useEffect(() => {
     if (isEqual(values, prevValues.current)) {
@@ -139,7 +121,6 @@ function useDataset<T>(values: T[]) {
     const { added, removed, updated } = diff(dataSet.get(), values);
 
     dataSet.remove(removed);
-    // Shallow clone dataSet to ensure props aren't mutated!
     if (added.length) {
       dataSet.add(shallowClone(added));
     }
@@ -153,107 +134,110 @@ function useDataset<T>(values: T[]) {
 }
 
 const VisGraph = forwardRef<
-  Network | undefined,
+  HTMLDivElement,
   NetworkGraphProps & HTMLAttributes<HTMLDivElement>
->(({ graph, events, options: propOptions, zoomKey, ...props }, ref) => {
-  const container = useRef<HTMLDivElement>(null);
-  const initialOptions = useSealedState(propOptions);
-  const edges = useDataset(graph.edges);
-  const nodes = useDataset(graph.nodes);
+>(
+  (
+    { graph, events, options: propOptions, zoomKey, networkRef, ...props },
+    ref
+  ) => {
+    const container = useRef<HTMLDivElement>(null);
+    const initialOptions = useSealedState(propOptions);
+    const edges = useDataset(graph.edges);
+    const nodes = useDataset(graph.nodes);
 
-  const [network, setNetwork] = useState<Network>();
+    const [network, setNetwork] = useState<Network>();
 
-  useImperativeHandle(ref, () => network, [network]);
+    useImperativeHandle(networkRef, () => network, [network]);
 
-  useEffect(() => {
-    if (!network || !events) {
-      return () => {};
-    }
-    // Add user provied events to network
-    for (const [eventName, callback] of Object.entries(events)) {
-      if (callback) {
-        network.on(eventName as NetworkEvents, callback);
+    useEffect(() => {
+      if (!network || !events) {
+        return () => {};
       }
-    }
-    return () => {
+      // Add user provied events to network
       for (const [eventName, callback] of Object.entries(events)) {
         if (callback) {
-          network.off(eventName as NetworkEvents, callback);
+          network.on(eventName as NetworkEvents, callback);
         }
       }
-    };
-  }, [events, network]);
-
-  useEffect(() => {
-    if (!zoomKey || !network) {
-      return () => {};
-    }
-    const { interactionHandler } = network as any;
-    if (interactionHandler) {
-      const originalHandler =
-        interactionHandler.body.eventListeners.onMouseWheel;
-      interactionHandler.body.eventListeners.onMouseWheel = (
-        event: MouseEvent
-      ) => {
-        if (!event[zoomKey]) return; // ctrlKey detects a max touchpad pinch in onwheel event
-        originalHandler(event);
-      };
       return () => {
-        interactionHandler.body.eventListeners.onMouseWheel = originalHandler;
+        for (const [eventName, callback] of Object.entries(events)) {
+          if (callback) {
+            network.off(eventName as NetworkEvents, callback);
+          }
+        }
       };
-    }
-    return () => {};
-  }, [network, zoomKey]);
+    }, [events, network]);
 
-  useEffect(() => {
-    if (!network || !propOptions) {
-      return;
-    }
-    try {
-      network.setOptions(propOptions);
-    } catch (error) {
-      // Throws when it hot reloads... Yay
-      if (process.env.NODE_ENV !== 'development') {
-        // Still throw it in prod where there's no hot reload
-        throw error;
+    useEffect(() => {
+      if (!zoomKey || !network) {
+        return () => {};
       }
-    }
-  }, [network, propOptions]);
+      const { interactionHandler } = network as any;
+      if (interactionHandler) {
+        const originalHandler =
+          interactionHandler.body.eventListeners.onMouseWheel;
+        interactionHandler.body.eventListeners.onMouseWheel = (
+          event: MouseEvent
+        ) => {
+          if (!event[zoomKey]) return; // ctrlKey detects a max touchpad pinch in onwheel event
+          originalHandler(event);
+        };
+        return () => {
+          interactionHandler.body.eventListeners.onMouseWheel = originalHandler;
+        };
+      }
+      return () => {};
+    }, [network, zoomKey]);
 
-  useEffect(() => {
-    // Creating the network has to be done in a useEffect because it needs access to a ref
+    useEffect(() => {
+      if (!network || !propOptions) {
+        return;
+      }
+      try {
+        network.setOptions(propOptions);
+      } catch (error) {
+        // Throws when it hot reloads... Yay
+        if (process.env.NODE_ENV !== 'development') {
+          // Still throw it in prod where there's no hot reload
+          throw error;
+        }
+      }
+    }, [network, propOptions]);
 
-    // merge user provied options with our default ones
-    // defaultsDeep mutates the host object
-    const mergedOptions = defaultsDeep(
-      cloneDeep(initialOptions),
-      defaultOptions
+    useEffect(() => {
+      // Creating the network has to be done in a useEffect because it needs access to a ref
+
+      // merge user provied options with our default ones
+      // defaultsDeep mutates the host object
+      const mergedOptions = defaultsDeep(
+        cloneDeep(initialOptions),
+        defaultOptions
+      );
+      const newNetwork = new Network(
+        container.current as HTMLElement,
+        { edges, nodes },
+        mergedOptions
+      );
+      setNetwork(newNetwork);
+      return () => {
+        // Cleanup the network on component unmount
+        newNetwork.destroy();
+      };
+    }, [edges, initialOptions, nodes]);
+
+    return (
+      <div
+        style={{ width: '100%', height: '100%' }}
+        ref={(el) => {
+          handleRef(container, el);
+          handleRef(ref, el);
+        }}
+        {...props}
+      />
     );
-    const newNetwork = new Network(
-      container.current as HTMLElement,
-      { edges, nodes },
-      mergedOptions
-    );
-    setNetwork(newNetwork);
-    return () => {
-      // Cleanup the network on component unmount
-      newNetwork.destroy();
-    };
-  }, [edges, initialOptions, nodes]);
-
-  // //resize network on window resize
-  // function onContainerResize() {
-  //   if (network) {
-  //     network.redraw();
-  //   }
-  // }
-
-  // useResizeObserver(container, onContainerResize);
-
-  return (
-    <div style={{ width: '100%', height: '100%' }} ref={container} {...props} />
-  );
-});
+  }
+);
 // Set displayName explicitly as it isn't implicitly set
 VisGraph.displayName = 'VisGraph';
 export default VisGraph;
