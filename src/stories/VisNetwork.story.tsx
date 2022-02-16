@@ -21,6 +21,7 @@ const Template: Story<StoryProps> = (args) => {
 
 export const BasicNetwork = Template.bind({});
 BasicNetwork.args = {
+  options: { autoResize: false },
   graph: {
     nodes: [{ id: 1 }, { id: 2 }, { id: 3 }],
     edges: [
@@ -65,4 +66,24 @@ export const ZoomKey = ZoomKeyTemplate.bind({});
 ZoomKey.args = {
   ...BasicNetwork.args,
   zoomKey: 'ctrlKey',
+};
+
+const ResizeTemplate: Story<StoryProps> = (args) => {
+  return (
+    <div
+      style={{
+        resize: 'both',
+        overflow: 'auto',
+        border: '1px solid black',
+      }}
+    >
+      <VisGraph {...args} />
+    </div>
+  );
+};
+
+export const ResizeNetwork = ResizeTemplate.bind({});
+ResizeNetwork.args = {
+  ...BasicNetwork.args,
+  options: { autoResize: true },
 };
