@@ -127,7 +127,8 @@ function shallowClone<T>(array: T[]): T[] {
 }
 
 function useDataset<T>(values: T[]) {
-  const dataSet = useSealedState(() => new DataSet<T>(values));
+  // Shallow clone dataSet to ensure props aren't mutated!
+  const dataSet = useSealedState(() => new DataSet<T>(shallowClone(values)));
   const prevValues = useRef(values);
   useEffect(() => {
     if (isEqual(values, prevValues.current)) {
@@ -136,7 +137,6 @@ function useDataset<T>(values: T[]) {
     const { added, removed, updated } = diff(dataSet.get(), values);
 
     dataSet.remove(removed);
-    // Shallow clone dataSet to ensure props aren't mutated!
     if (added.length) {
       dataSet.add(shallowClone(added));
     }
